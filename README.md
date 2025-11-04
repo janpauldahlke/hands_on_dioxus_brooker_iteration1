@@ -2,4 +2,4 @@
 
 - get a API key from finnhub.io
 - create `.env` like so
-  - `bash FINNHUB_API_KEY=d<yourKeyHere>`
+  - `FINNHUB_API_KEY=d<yourKeyHere>`
