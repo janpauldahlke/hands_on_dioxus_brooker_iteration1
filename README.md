@@ -5,3 +5,8 @@
 - get a API key from finnhub.io
 - create `.env` like so
   - `FINNHUB_API_KEY=d<yourKeyHere>`
+
+### how to:
+
+- follow the installation process on dioxuslabs.com
+- in this project run `dx serve --web` to gain a local hot-reloadable webserver
