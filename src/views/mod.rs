@@ -16,3 +16,6 @@ pub use start::Start;
 
 mod profile;
 pub use profile::Profile;
+
+mod stocks;
+pub use stocks::Stocks;

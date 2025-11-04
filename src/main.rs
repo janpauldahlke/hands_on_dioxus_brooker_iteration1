@@ -2,7 +2,7 @@
 // need dioxus
 use dioxus::prelude::*;
 
-use views::{Navbar, Start, Profile};
+use views::{Navbar, Start, Profile, Stocks};
 
 /// Define a components module that contains all shared components for our app.
 mod components;
@@ -27,6 +27,8 @@ enum Route {
         #[route("/profile")]
         Profile{},
 
+        #[route("/stocks")]
+        Stocks {}
 }
 
 // We can import assets in dioxus with the `asset!` macro. This macro takes a path to an asset relative to the crate root.
@@ -36,6 +38,8 @@ const FAVICON: Asset = asset!("/assets/favicon.ico");
 const MAIN_CSS: Asset = asset!("/assets/styling/main.css");
 
 fn main() {
+    // .env load
+    dotenvy::dotenv().ok();
     // The `launch` function is the main entry point for a dioxus app. It takes a component and renders it with the platform feature
     // you have enabled
     dioxus::launch(App);
