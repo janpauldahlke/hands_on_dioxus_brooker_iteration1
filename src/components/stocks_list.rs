@@ -9,7 +9,7 @@ pub fn StocksList(
 ) -> Element {
     rsx! {
         div { class: "stocks-container",
-            div { class: "stocks-list",
+            div { class: "stocks-list", id: "stocks-list", tabindex: "0",
                 for symbol in symbols.iter() {
                     StockListItem {
                         symbol: symbol.clone(),
