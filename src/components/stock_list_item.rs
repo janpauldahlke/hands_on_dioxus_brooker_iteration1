@@ -12,7 +12,10 @@ pub fn StockListItem(
     rsx! {
         div {
             class: if selected { "selected" } else { "" },
-            onclick: move |_| on_click.call(symbol.clone()),
+            onclick: move |_| {
+                eprintln!("[STOCK_LIST_ITEM] Clicked on symbol: {}", symbol);
+                on_click.call(symbol.clone());
+            },
             div { class: "symbol", "{symbol} {stock_name}" }
         }
     }
