@@ -13,3 +13,6 @@ pub use stock_list_item::StockListItem;
 
 mod stocks_list;
 pub use stocks_list::StocksList;
+
+mod stock_chart;
+pub use stock_chart::StockChart;

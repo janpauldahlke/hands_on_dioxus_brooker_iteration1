@@ -10,3 +10,5 @@
 
 - follow the installation process on dioxuslabs.com
 - in this project run `dx serve --web` to gain a local hot-reloadable webserver
+
+### today we learned that finnhub.io does not provide historicalStockData on the free tier, time for 🍻

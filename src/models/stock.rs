@@ -75,6 +75,24 @@ pub struct StockQuote {
     pub timestamp: i64,
 }
 
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct StockCandle {
+    #[serde(rename = "c")]
+    pub close_prices: Vec<f64>,
+    #[serde(rename = "h")]
+    pub high_prices: Vec<f64>,
+    #[serde(rename = "l")]
+    pub low_prices: Vec<f64>,
+    #[serde(rename = "o")]
+    pub open_prices: Vec<f64>,
+    #[serde(rename = "s")]
+    pub status: String,
+    #[serde(rename = "t")]
+    pub timestamps: Vec<i64>,
+    #[serde(rename = "v")]
+    pub volumes: Vec<i64>,
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct StockSymbol {
     pub symbol: String,

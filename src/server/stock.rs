@@ -1,5 +1,5 @@
 use dioxus::prelude::*;
-use crate::models::StockQuote;
+use crate::models::{StockQuote, StockCandle};
 use anyhow::Result;
 use reqwest::Error;
 use futures::future::try_join_all;
@@ -97,4 +97,74 @@ pub async fn get_multiple_stock_quotes(symbols: Vec<String>) -> Result<Vec<(Stri
     
     eprintln!("[STOCKS] SUCCESS fetched {} quotes total", results.len());
     Ok(results)
+}
+
+#[post("/api/stock/candles")]
+pub async fn get_stock_candles(symbol: String, period: Option<String>) -> Result<StockCandle, ServerFnError> {
+    dotenvy::dotenv().ok();
+    
+    let api_key = std::env::var("FINNHUB_API_KEY")
+        .map_err(|_| ServerFnError::new("FINNHUB_API_KEY not found in environment"))?;
+    
+    let now = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_err(|e| ServerFnError::new(format!("Failed to get current time: {}", e)))?
+        .as_secs() as i64;
+    
+    // Determine resolution and time range based on period
+    // TODO; moe this date validation into its own module
+    let (resolution, from_timestamp) = match period.as_deref() {
+        Some("MONTH") => {
+            // Last 30 days with daily resolution
+            ("D", now - (30 * 24 * 60 * 60))
+        }
+        Some("YEAR") => {
+            // Last 365 days with daily resolution
+            ("D", now - (365 * 24 * 60 * 60))
+        }
+        Some("OVERALL") => {
+            // Last 5 years (capped at 5 years max) with monthly resolution
+            let five_years_ago = now - (5 * 365 * 24 * 60 * 60);
+            ("M", five_years_ago)
+        }
+        _ => {
+            // Default to last 30 days with daily resolution
+            ("D", now - (30 * 24 * 60 * 60))
+        }
+    };
+    
+    eprintln!("[STOCKS] Fetching candles for {} (period: {:?}, resolution: {}, from: {}, to: {})", symbol, period, resolution, from_timestamp, now);
+    
+    let url = format!(
+        "https://finnhub.io/api/v1/stock/candle?symbol={}&resolution={}&from={}&to={}&token={}",
+        symbol, resolution, from_timestamp, now, api_key
+    );
+    
+    let response = reqwest::get(&url).await
+        .map_err(|e| {
+            eprintln!("[STOCKS] ERROR fetching candles for {}: {}", symbol, e);
+            ServerFnError::new(format!("Failed to fetch candles: {}", e))
+        })?;
+    
+    if !response.status().is_success() {
+        let status = response.status();
+        let text = response.text().await.unwrap_or_default();
+        eprintln!("[STOCKS] ERROR API error for candles {}: {} - {}", symbol, status, text);
+        return Err(ServerFnError::new(format!("API error {}: {}", status, text)));
+    }
+    
+    let text = response.text().await
+        .map_err(|e| {
+            eprintln!("[STOCKS] ERROR reading response for candles {}: {}", symbol, e);
+            ServerFnError::new(format!("Failed to read response: {}", e))
+        })?;
+    
+    let candle: StockCandle = serde_json::from_str(&text)
+        .map_err(|e| {
+            eprintln!("[STOCKS] ERROR parsing JSON for candles {}: {}. Response: {}", symbol, e, text);
+            ServerFnError::new(format!("Failed to parse JSON. Response: {}. Error: {}", text, e))
+        })?;
+    
+    eprintln!("[STOCKS] SUCCESS fetched candles for {} ({} data points)", symbol, candle.timestamps.len());
+    Ok(candle)
 }
