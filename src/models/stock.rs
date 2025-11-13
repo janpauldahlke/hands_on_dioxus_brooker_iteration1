@@ -52,6 +52,13 @@ pub fn get_popular_stock_symbols() -> Vec<String> {
         .collect()
 }
 
+pub fn get_stock_name(symbol: &str) -> Option<String> {
+    POPULAR_STOCKS_DATA
+        .iter()
+        .find(|(sym, _)| *sym == symbol)
+        .map(|(_, name)| name.to_string())
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct StockQuote {
     #[serde(rename = "c")]
