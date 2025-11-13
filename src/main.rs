@@ -1,7 +1,6 @@
 // The dioxus prelude contains a ton of common items used in dioxus apps. It's a good idea to import wherever you
 // need dioxus
 use dioxus::prelude::*;
-
 use views::{Navbar, Start, Profile, Stocks, MostCommonStocks};
 
 /// Define a components module that contains all shared components for our app.
@@ -19,7 +18,7 @@ mod server;
 /// the components for that route will be rendered.
 #[derive(Debug, Clone, Routable, PartialEq)]
 #[rustfmt::skip]
-enum Route {
+pub enum Route {
     #[layout(Navbar)]
         #[route("/")]
         Start {},
@@ -30,8 +29,8 @@ enum Route {
         #[route("/most-common-stocks")]
         MostCommonStocks {},
 
-        #[route("/stocks")]
-        Stocks {}
+        #[route("/stocks/:symbol")]
+        Stocks { symbol: String }
 }
 
 // We can import assets in dioxus with the `asset!` macro. This macro takes a path to an asset relative to the crate root.

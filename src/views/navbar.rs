@@ -17,7 +17,6 @@ pub fn Navbar() -> Element {
             Link { to: Route::Start {}, "back to <Start>" }
             Link { to: Route::Profile {}, "<Profile>" }
             Link { to: Route::MostCommonStocks {}, "<Most Common Stocks>" }
-            Link { to: Route::Stocks {}, "<Stocks>" }
         }
 
 

@@ -3,9 +3,12 @@ use crate::server::stock::get_stock_quote;
 use crate::components::StockCard;
 
 #[component]
-pub fn Stocks() -> Element {
-    // US market apple stock hardcoded
-    let stock_quote = use_server_future(move || get_stock_quote("AAPL".to_string()))?;
+pub fn Stocks(symbol: String) -> Element {
+    let symbol_clone = symbol.clone();
+    
+    let stock_quote = use_server_future(move || {
+        get_stock_quote(symbol_clone.clone()) 
+    })?;
     
     rsx! {
         div { id: "stocks",
@@ -13,7 +16,7 @@ pub fn Stocks() -> Element {
             match stock_quote() {
                 Some(Ok(quote)) => {
                     rsx! {
-                        StockCard { symbol: "AAPL".to_string(), quote }
+                        StockCard { symbol: symbol.clone(), quote }
                     }
                 }
                 Some(Err(e)) => {

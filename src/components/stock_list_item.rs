@@ -1,5 +1,6 @@
 use dioxus::prelude::*;
 use crate::models::get_stock_name;
+use crate::Route;
 
 #[component]
 pub fn StockListItem(
@@ -8,13 +9,17 @@ pub fn StockListItem(
     on_click: EventHandler<String>,
 ) -> Element {
     let stock_name = get_stock_name(&symbol).unwrap_or_else(|| symbol.clone());
+    let symbol_for_click = symbol.clone();
     
     rsx! {
-        div {
+        Link {
+            to: Route::Stocks {
+                symbol: symbol.clone(),
+            },
             class: if selected { "selected" } else { "" },
             onclick: move |_| {
-                eprintln!("[STOCK_LIST_ITEM] Clicked on symbol: {}", symbol);
-                on_click.call(symbol.clone());
+                eprintln!("[STOCK_LIST_ITEM] Clicked on symbol: {}", symbol_for_click);
+                on_click.call(symbol_for_click.clone());
             },
             div { class: "symbol", "{symbol} {stock_name}" }
         }
