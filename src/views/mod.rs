@@ -19,3 +19,6 @@ pub use profile::Profile;
 
 mod stocks;
 pub use stocks::Stocks;
+
+mod most_common_stocks;
+pub use most_common_stocks::MostCommonStocks;

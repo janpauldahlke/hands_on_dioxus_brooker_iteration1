@@ -7,3 +7,9 @@ pub use echo::Echo;
 
 mod stock_card;
 pub use stock_card::StockCard;
+
+mod stock_list_item;
+pub use stock_list_item::StockListItem;
+
+mod stocks_list;
+pub use stocks_list::StocksList;

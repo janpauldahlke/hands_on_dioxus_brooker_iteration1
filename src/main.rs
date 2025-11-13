@@ -2,7 +2,7 @@
 // need dioxus
 use dioxus::prelude::*;
 
-use views::{Navbar, Start, Profile, Stocks};
+use views::{Navbar, Start, Profile, Stocks, MostCommonStocks};
 
 /// Define a components module that contains all shared components for our app.
 mod components;
@@ -26,6 +26,9 @@ enum Route {
 
         #[route("/profile")]
         Profile{},
+
+        #[route("/most-common-stocks")]
+        MostCommonStocks {},
 
         #[route("/stocks")]
         Stocks {}
