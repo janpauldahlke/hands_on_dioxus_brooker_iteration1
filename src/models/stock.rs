@@ -59,6 +59,7 @@ pub fn get_stock_name(symbol: &str) -> Option<String> {
         .map(|(_, name)| name.to_string())
 }
 
+// finnhub tech, not available in the free tier
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct StockQuote {
     #[serde(rename = "c")]
@@ -97,4 +98,41 @@ pub struct StockCandle {
 pub struct StockSymbol {
     pub symbol: String,
     pub name: String,
+}
+
+// use this for stockchart data and use massive api key here
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct CustomBarResponse {
+    pub adjusted: bool,
+    #[serde(rename = "next_url")]
+    pub next_url: Option<String>,
+    #[serde(rename = "queryCount")]
+    pub query_count: i32,
+    #[serde(rename = "request_id")]
+    pub request_id: String,
+    pub results: Vec<AggregateBar>,
+    #[serde(rename = "resultsCount")]
+    pub results_count: i32,
+    pub status: String,
+    pub ticker: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct AggregateBar {
+    #[serde(rename = "c")]
+    pub close: f64,
+    #[serde(rename = "h")]
+    pub high: f64,
+    #[serde(rename = "l")]
+    pub low: f64,
+    #[serde(rename = "n")]
+    pub number_of_transactions: Option<i32>,
+    #[serde(rename = "o")]
+    pub open: f64,
+    #[serde(rename = "t")]
+    pub timestamp: i64,  // Unix millisecond timestamp
+    #[serde(rename = "v")]
+    pub volume: f64,
+    #[serde(rename = "vw")]
+    pub volume_weighted_average_price: Option<f64>,
 }

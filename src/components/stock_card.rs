@@ -1,9 +1,11 @@
 use dioxus::prelude::*;
 use crate::models::{StockQuote, get_stock_name};
+use crate::components::StockChart;
 
 #[component]
 pub fn StockCard(symbol: String, quote: StockQuote) -> Element {
     
+    let mut showStockChart = use_signal(|| false);
     let change = quote.current_price - quote.previous_close;
     let change_percent = (change / quote.previous_close) * 100.0;
     let stock_name = get_stock_name(&symbol).unwrap_or_else(|| symbol.clone());
@@ -23,6 +25,23 @@ pub fn StockCard(symbol: String, quote: StockQuote) -> Element {
                 p { "Low: {quote.low:.2}" }
                 p { "Open: {quote.open:.2}" }
                 p { "Previous Close: {quote.previous_close:.2}" }
+            }
+
+            div { "--------------------------------" }
+
+            div { class: "stock-chart",
+                p { "Collapsible chart placeholder" }
+            }
+
+            button {
+                onclick: move |_| {
+                    showStockChart.with_mut(|showStockChart| *showStockChart = !*showStockChart);
+                },
+                "Show/Hide Chart"
+            }
+
+            if showStockChart() {
+                StockChart { symbol: symbol.clone() }
             }
         }
     }
