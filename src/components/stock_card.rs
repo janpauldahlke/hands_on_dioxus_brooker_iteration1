@@ -1,11 +1,11 @@
 use dioxus::prelude::*;
-use crate::models::{StockQuote, get_stock_name};
+use crate::models::{StockQuote, get_stock_name, Period};
 use crate::components::StockChart;
 
 #[component]
 pub fn StockCard(symbol: String, quote: StockQuote) -> Element {
     
-    let mut showStockChart = use_signal(|| false);
+    let mut selectedPeriod = use_signal(|| Period::None);
     let change = quote.current_price - quote.previous_close;
     let change_percent = (change / quote.previous_close) * 100.0;
     let stock_name = get_stock_name(&symbol).unwrap_or_else(|| symbol.clone());
@@ -35,13 +35,34 @@ pub fn StockCard(symbol: String, quote: StockQuote) -> Element {
 
             button {
                 onclick: move |_| {
-                    showStockChart.with_mut(|showStockChart| *showStockChart = !*showStockChart);
+                    selectedPeriod.with_mut(|selectedPeriod| *selectedPeriod = Period::Day);
                 },
-                "Show/Hide Chart"
+                "Day"
             }
 
-            if showStockChart() {
-                StockChart { symbol: symbol.clone() }
+            button {
+                onclick: move |_| {
+                    selectedPeriod.with_mut(|selectedPeriod| *selectedPeriod = Period::Week);
+                },
+                "Week"
+            }
+
+            button {
+                onclick: move |_| {
+                    selectedPeriod.with_mut(|selectedPeriod| *selectedPeriod = Period::Month);
+                },
+                "Month"
+            }
+
+            button {
+                onclick: move |_| {
+                    selectedPeriod.with_mut(|selectedPeriod| *selectedPeriod = Period::Year);
+                },
+                "Year"
+            }
+
+            if selectedPeriod() != Period::None {
+                StockChart { symbol: symbol.clone(), period: selectedPeriod() }
             }
         }
     }

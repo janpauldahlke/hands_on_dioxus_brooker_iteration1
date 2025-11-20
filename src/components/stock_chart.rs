@@ -1,15 +1,16 @@
 use dioxus::prelude::*;
 use dioxus_charts::{BarChart, LineChart};
-use web_sys::console;
+
 use crate::server::stock::get_stock_custom_bars;
 use crate::models::AggregateBar;
+use crate::models::Period;
+
+use web_sys::console;
 use serde_json;
-use chrono::{DateTime, Utc, TimeZone, Datelike, Timelike};
+use chrono::{DateTime, Utc, TimeZone, Datelike, Timelike, Duration};
 
 const STOCK_CHART_CSS: Asset = asset!("/assets/styling/stock-chart.css");
 
-
-//TODO; move this to helpers or utils or somewere fitting
 fn timestamp_to_date_string(timestamp_ms: i64) -> String {
     let timestamp_secs = timestamp_ms / 1000;
     let datetime = match Utc.timestamp_opt(timestamp_secs, 0) {
@@ -34,11 +35,16 @@ fn extract_close_prices(bars: &[AggregateBar]) -> Vec<f32> {
 }
 
 #[component]
-pub fn StockChart(symbol: String) -> Element {
+pub fn StockChart(symbol: String, period: Period) -> Element {
+
+    // Log to server console
+    eprintln!("[CHART VIEW] Displaying chart for {} with period {}", symbol, period);
+    // Log to browser console
+    console::log_1(&format!("[CHART VIEW] Displaying chart for {} with period {}", symbol, period).into());
 
     let symbol_clone = symbol.clone();
     let custom_bars = use_server_future(move || {
-        get_stock_custom_bars(symbol_clone.clone(), Some("MONTH".to_string()))
+        get_stock_custom_bars(symbol_clone.clone(), Some(period.to_string()))
 
     })?;
 
@@ -90,6 +96,7 @@ pub fn StockChart(symbol: String) -> Element {
                         //     }
                         // }
 
+            
                         div { class: "stock-chart-line-wrapper",
                             LineChart {
                                 show_grid: true,

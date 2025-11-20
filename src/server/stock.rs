@@ -1,8 +1,12 @@
 use dioxus::prelude::*;
 use crate::models::{StockQuote, StockCandle, CustomBarResponse, AggregateBar};
+use crate::models::Period;
+
 use anyhow::Result;
 use reqwest::Error;
 use futures::future::try_join_all;
+use chrono::{Utc, Duration};
+
 
 #[post("/api/stock/quote")]
 pub async fn get_stock_quote(symbol: String) -> Result<StockQuote, ServerFnError> {
@@ -181,9 +185,23 @@ pub async fn get_stock_custom_bars(symbol: String, period: Option<String>) -> Re
         // example argument structure
         //https://api.massive.com/v2/aggs/ticker/AAPL/range/1/day/2023-01-09/2023-02-10?adjusted=true&sort=asc&limit=120&apiKey=TkwDmtA7dbomkd2yYL12qzTOopfXv1Dp
     
+    // Convert Option<String> to Period enum
+    let period_enum = period
+        .as_ref()
+        .and_then(|p| match p.as_str() {
+            "DAY" => Some(Period::Day),
+            "WEEK" => Some(Period::Week),
+            "MONTH" => Some(Period::Month),
+            "YEAR" => Some(Period::Year),
+            _ => Some(Period::Month), // Default to Month
+        })
+        .unwrap_or(Period::Month); // Default to Month if None
+    
+    let (from_date, to_date) = period_to_date_range(&period_enum);
+
     let url = format!(
-        "https://api.massive.com/v2/aggs/ticker/{}/range/1/day/2025-11-01/2025-11-20?adjusted=true&sort=asc&apiKey={}",
-        symbol, api_key
+        "https://api.massive.com/v2/aggs/ticker/{}/range/1/day/{}/{}?adjusted=true&sort=asc&apiKey={}",
+        symbol, from_date, to_date, api_key
     );
 
     let response = reqwest::get(&url).await
@@ -202,4 +220,36 @@ pub async fn get_stock_custom_bars(symbol: String, period: Option<String>) -> Re
         .map_err(|e| ServerFnError::new(format!("Failed to parse JSON. Response was: {}. Error: {}", text, e)))?;
     
     Ok(custom_bar)
+}
+
+//TODO; move this to helpers or utils or somewere fitting
+// Helper function to convert Period to date range (from_date, to_date) in YYYY-MM-DD format
+fn period_to_date_range(period: &Period) -> (String, String) {
+    let today = Utc::now().date_naive();
+    let to_date = today.format("%Y-%m-%d").to_string();
+    
+    let from_date = match period {
+        Period::Day => {
+            // Today only
+            today.format("%Y-%m-%d").to_string()
+        }
+        Period::Week => {
+            // Today - 7 days
+            (today - Duration::days(7)).format("%Y-%m-%d").to_string()
+        }
+        Period::Month => {
+            // Today - 30 days
+            (today - Duration::days(30)).format("%Y-%m-%d").to_string()
+        }
+        Period::Year => {
+            // Today - 365 days
+            (today - Duration::days(365)).format("%Y-%m-%d").to_string()
+        }
+        Period::None => {
+            // Default to month
+            (today - Duration::days(30)).format("%Y-%m-%d").to_string()
+        }
+    };
+    
+    (from_date, to_date)
 }
