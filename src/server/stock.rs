@@ -182,7 +182,7 @@ pub async fn get_stock_custom_bars(symbol: String, period: Option<String>) -> Re
         //https://api.massive.com/v2/aggs/ticker/AAPL/range/1/day/2023-01-09/2023-02-10?adjusted=true&sort=asc&limit=120&apiKey=TkwDmtA7dbomkd2yYL12qzTOopfXv1Dp
     
     let url = format!(
-        "https://api.massive.com/v2/aggs/ticker/{}/range/1/day/2025-01-09/2025-02-10?adjusted=true&sort=asc&apiKey={}",
+        "https://api.massive.com/v2/aggs/ticker/{}/range/1/day/2025-11-01/2025-11-20?adjusted=true&sort=asc&apiKey={}",
         symbol, api_key
     );
 
