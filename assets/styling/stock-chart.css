@@ -1,0 +1,10 @@
+.stock-chart-line-wrapper {
+  width: 80vw;
+  height: 80vhv;
+  margin: 0 auto;
+}
+
+.dx-line {
+  stroke: blue;
+  color: blue;
+}
